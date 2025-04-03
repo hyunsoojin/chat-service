@@ -6,17 +6,26 @@ spring:
     username: service_user
     password: service_user
     driver-class-name: com.mysql.cj.jdbc.Driver
-
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
 
   security:
     oauth2:
       client:
         registration:
           kakao:
-            client-id: cccf5f165a366116f5852e7e38ac25eb
-            client-secret: DMbH02bCIfqALWzmRKXTSPI80Ai71Oan
+            client-id: f6aa2a7b38e43f6adf6ec248d25ffa55
+            client-secret: imtVlSVqMc1Z9gyugwBpyvoGZ9x2GjZc
             scope:
               - profile_nickname
+              - account_email
+              - name
+              - gender
+              - birthday
+              - birthyear
+              - phone_number
             redirect-uri: "http://localhost:8080/login/oauth2/code/kakao"
             client-name: kakao
             authorization-grant-type: authorization_code
