@@ -1,6 +1,6 @@
 package com.example.chatservice.services;
 
-import com.example.chatservice.entity.Member;
+import com.example.chatservice.entities.Member;
 import com.example.chatservice.enums.Gender;
 import com.example.chatservice.repositories.MemberRepository;
 import com.example.chatservice.vos.CustomOAuth2User;

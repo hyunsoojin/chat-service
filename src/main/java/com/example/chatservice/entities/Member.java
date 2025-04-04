@@ -1,4 +1,4 @@
-package com.example.chatservice.entity;
+package com.example.chatservice.entities;
 
 import com.example.chatservice.enums.Gender;
 import jakarta.persistence.*;
