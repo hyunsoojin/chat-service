@@ -27,7 +27,14 @@ public class Chatroom {
     @OneToMany(mappedBy = "chatroom")
     Set<MemberChatroomMapping> memberChatroomMappingSet;
 
+    @Transient
+    Boolean hasNewMessage;
+
     LocalDateTime createdAt;
+
+    public void setHasNewMessage(Boolean hasNewMessage) {
+        this.hasNewMessage = hasNewMessage;
+    }
 
     public MemberChatroomMapping addMember(Member member){
         if (this.memberChatroomMappingSet == null) {

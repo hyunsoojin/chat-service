@@ -38,13 +38,16 @@ public class ChatService {
         return chatroom;
     }
 
-    public Boolean joinChatrooom(Member member, Long chatroomId){
-        if (memberChatroomMappingRepository.existsByMemberIdAndChatroomId(member.getId(),chatroomId)){
+    public Boolean joinChatrooom(Member member, Long newChatroomId, Long currentChatroomId){
+        if (currentChatroomId != null){
+            updateLastCheckedAt(member, currentChatroomId);
+        }
+        if (memberChatroomMappingRepository.existsByMemberIdAndChatroomId(member.getId(),newChatroomId)){
             log.info("이미 참여한 채팅방입니다.");
             return false;
         }
 
-        Chatroom chatroom = chatroomRepository.findById(chatroomId).get();
+        Chatroom chatroom = chatroomRepository.findById(newChatroomId).get();
 
         MemberChatroomMapping memberChatroomMapping = MemberChatroomMapping.builder()
                 .member(member)
@@ -53,6 +56,13 @@ public class ChatService {
         memberChatroomMappingRepository.save(memberChatroomMapping);
 
         return true;
+    }
+
+    private void updateLastCheckedAt(Member member, Long currentChatroomId){
+        MemberChatroomMapping memberChatroomMapping = memberChatroomMappingRepository.findByMemberIdAndChatroomId(member.getId(), currentChatroomId)
+                .get();
+        memberChatroomMapping.updateLastCheckedAt();
+        memberChatroomMappingRepository.save(memberChatroomMapping);
     }
 
     @Transactional
@@ -71,7 +81,11 @@ public class ChatService {
         List<MemberChatroomMapping> memberChatroomMappingList = memberChatroomMappingRepository.findAllByMemberId(member.getId());
 
         return memberChatroomMappingList.stream()
-                .map(MemberChatroomMapping::getChatroom)
+                .map(memberChatroomMapping -> {
+                    Chatroom chatroom = memberChatroomMapping.getChatroom();
+                    chatroom.setHasNewMessage(messageRepository.existsByChatroomIdAndCreatedAtAfter(chatroom.getId(), memberChatroomMapping.getLastCheckedAt()));
+                    return chatroom;
+                })
                 .toList();
     }
 
@@ -82,6 +96,7 @@ public class ChatService {
                 .text(text)
                 .member(member)
                 .chatroom(chatroom)
+                .createdAt(LocalDateTime.now())
                 .build();
         return messageRepository.save(message);
 
