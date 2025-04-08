@@ -1,6 +1,7 @@
 package com.example.chatservice.controllers;
 
 import com.example.chatservice.dtos.ChatMessage;
+import com.example.chatservice.dtos.ChatroomDto;
 import com.example.chatservice.entities.Message;
 import com.example.chatservice.services.ChatService;
 import com.example.chatservice.vos.CustomOAuth2User;
@@ -11,6 +12,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
@@ -30,9 +32,9 @@ public class StompChatController {
     @SendTo("/sub/chats/{chatroomId}")
     public ChatMessage handleMessage(@AuthenticationPrincipal Principal principal, @DestinationVariable Long chatroomId, @Payload Map<String, String> payload){
         log.info("{} send {} in {}",principal.getName(), payload, chatroomId);
-        CustomOAuth2User user = (CustomOAuth2User) ((OAuth2AuthenticationToken) principal).getPrincipal();
+        CustomOAuth2User user = (CustomOAuth2User) ((AbstractAuthenticationToken) principal).getPrincipal();
         Message message = chatService.saveMessage(user.getMember(), chatroomId, payload.get("message"));
-        messagingTemplate.convertAndSend("/sub/chats/news", chatroomId);
+        messagingTemplate.convertAndSend("/sub/chats/updates", chatService.getChatroom(chatroomId));
         return new ChatMessage(principal.getName(), payload.get("message"));
     }
 }

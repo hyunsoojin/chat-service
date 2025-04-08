@@ -21,7 +21,7 @@ public class SecurityConfiguration {
         httpSecurity
                 .authorizeHttpRequests(request -> request.anyRequest().authenticated())
                 .oauth2Login(Customizer.withDefaults())
-                .csrf(csrf-> csrf.disable());
+                .csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
     }
 
@@ -32,9 +32,9 @@ public class SecurityConfiguration {
                 .securityMatcher("/consultants/**", "/login")
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(HttpMethod.POST, "/consultants").permitAll()
-                        .anyRequest().authenticated())
+                        .anyRequest().hasRole("CONSULTANT"))
                 .formLogin(Customizer.withDefaults())
-                .csrf(csrf-> csrf.disable());
+                .csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
     }
 

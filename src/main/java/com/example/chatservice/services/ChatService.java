@@ -1,5 +1,6 @@
 package com.example.chatservice.services;
 
+import com.example.chatservice.dtos.ChatroomDto;
 import com.example.chatservice.entities.Chatroom;
 import com.example.chatservice.entities.Member;
 import com.example.chatservice.entities.MemberChatroomMapping;
@@ -104,6 +105,13 @@ public class ChatService {
 
     public List<Message> getMessageList(Long chatroomId){
         return messageRepository.findAllByChatroomId(chatroomId);
+    }
+
+    @Transactional
+    public ChatroomDto getChatroom(Long chatroomId){
+        Chatroom chatroom = chatroomRepository.findById(chatroomId).get();
+
+        return ChatroomDto.from(chatroom);
     }
 
 }
