@@ -25,10 +25,12 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        Map<String, Object> attributeMap = oAuth2User.getAttribute("kakao_account");
-        String email = (String) attributeMap.get("email");
+        String email = oAuth2User.getAttribute("email");
         Member member = memberRepository.findByEmail(email)
-                .orElseGet(() -> registerMember(attributeMap));
+                .orElseGet(() -> {
+                    Member newMember = MemberFactory.create(userRequest, oAuth2User);
+                    return memberRepository.save(newMember);
+                });
         return new CustomOAuth2User(member, oAuth2User.getAttributes());
     }
 
